@@ -5,6 +5,10 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
+        <option value="$PROJECT_DIR$/EurekaService/pom.xml" />
+        <option value="$PROJECT_DIR$/ImageServer/pom.xml" />
+        <option value="$PROJECT_DIR$/ProductsService/pom.xml" />
+        <option value="$PROJECT_DIR$/ProductService/pom.xml" />
       </list>
     </option>
   </component>
