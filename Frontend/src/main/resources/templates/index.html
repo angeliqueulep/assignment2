@@ -153,8 +153,7 @@
             const response = await fetch('/products');
             const products = await response.json();
             const Imgresponse = await fetch('/images');
-            const images = [{id:0}]//await Imgresponse.json();
-            console.log('>>>>> ',response)
+            const images = await Imgresponse.json();
             function getUrlById(id) {
                 // Find the object in the array with the matching ID
                 const item = images.find(item => item.id === id);
