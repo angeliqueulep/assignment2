@@ -32,6 +32,7 @@ public class WebController {
     }
     @GetMapping("view-cart")
     public String getProductPage(Model model) {
+        List<ProductOrder> cartProducts = productOrderRepository.findAll();
         model.addAttribute("cartproducts",cartProducts);
         return "cart";
     }
