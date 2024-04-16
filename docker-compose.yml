@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql-container
+    restart: always
+    environment:
+      MYSQL_DATABASE: assignment2
+      MYSQL_USER: user
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - internal_network
+  edge-server:
+    image: eam/edge-server:1.0.0
+    container_name: edge-container
+    ports:
+      - "8080:8080"
+    networks:
+      - internal_network
+  image-service:
+    image: eam/image-service:1.0.0
+    container_name: image-container
+    networks:
+      - internal_network
+  product-service:
+    image: eam/product-service:1.0.0
+    container_name: product-container
+    networks:
+      - internal_network
+  order-service:
+    image: eam/order-service:1.0.0
+    container_name: orders-container
+    networks:
+      - internal_network
+  eureka-service:
+    image: eam/eureka-service:1.0.0
+    container_name: eureka-container
+    ports:
+      - "8761:8761"
+    networks:
+      - internal_network
+networks:
+  internal_network:
+    external: false
+    name: assignment2-network
+volumes:
+  mysql-data:
