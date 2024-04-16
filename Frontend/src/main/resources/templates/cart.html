@@ -166,7 +166,7 @@
                             if (!response.ok) {
                                 throw new Error('Failed to clear cart');
                             }
-                            alert("Order Saved and Cart Cleared!")
+                            if(!alert("Order Saved and Cart Cleared!")){window.location.reload();}
                         })
                     }).catch(error => {
                         console.error('Error:', error);

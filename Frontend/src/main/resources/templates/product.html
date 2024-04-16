@@ -146,7 +146,7 @@
             if (!response.ok) {
                 throw new Error('Failed to add item to cart');
             }
-            alert("Added item to cart!")
+            if(!alert("Added item to cart!")){window.location.reload();}
         })
             .catch(error => {
                 console.error('Error:', error);
