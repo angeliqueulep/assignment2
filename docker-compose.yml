@@ -32,14 +32,9 @@ services:
     container_name: product-container
     networks:
       - internal_network
-  orders-service:
-    image: eam/orders-service:1.0.0
+  order-service:
+    image: eam/order-service:1.0.0
     container_name: orders-container
-    networks:
-      - internal_network
-  admin-service:
-    image: eam/admin-service:1.0.0
-    container_name: admin-container
     networks:
       - internal_network
   eureka-service:
