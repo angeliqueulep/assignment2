@@ -26,6 +26,10 @@ public class OrderController {
 
     private StreamBridge streamBridge;
 
+    public OrderController(StreamBridge streamBridge){
+        this.streamBridge = streamBridge;
+    }
+
     private final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     // Get all orders
@@ -40,7 +44,7 @@ public class OrderController {
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         try {
             OrderDTO newOrder = orderService.createOrder(orderDTO);
-            logger.info("Sending request to Email Server");
+            logger.info("Sending event to Product Service");
             streamBridge.send("sendPlaceorder-out-0", newOrder);
             return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
         } catch (Exception e) {
