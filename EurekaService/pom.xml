@@ -57,7 +57,7 @@
                 <version>3.4.1</version>
                 <configuration>
                     <to>
-                        <image>gem/eureka-service:1.0.0</image>
+                        <image>eam/eureka-service:1.0.0</image>
                     </to>
                     <container>
                         <jvmFlags>
