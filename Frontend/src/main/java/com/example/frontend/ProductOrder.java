@@ -21,4 +21,8 @@ public class ProductOrder {
 
     private long productId;
     private int quantity;
+
+    private String productName;
+    private String productDescription;
+    private double productPrice;
 }

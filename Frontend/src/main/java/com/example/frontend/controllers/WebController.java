@@ -36,4 +36,10 @@ public class WebController {
         model.addAttribute("cartproducts",cartProducts);
         return "cart";
     }
+
+    @GetMapping("viewOrderHistory")
+    public String getOrderHistory(Model model) {
+        model.addAttribute("orders", productOrderRepository.findAll());
+        return "orderHistory";
+    }
 }
