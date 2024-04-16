@@ -81,5 +81,16 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 
+    // update stock
+    public ProductDTO updateStock(Long id, int stock) {
+        Product existingProduct = productRepository.findById(id).orElse(null);
+        if (existingProduct != null) {
+            existingProduct.setStock(stock);
+            existingProduct = productRepository.save(existingProduct);
+            return convertToDTO(existingProduct);
+        }
+        return null;
+    }
+
 
 }

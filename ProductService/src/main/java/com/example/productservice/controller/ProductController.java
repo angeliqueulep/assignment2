@@ -62,4 +62,15 @@ public class ProductController {
         }
     }
 
+    //Update product stock
+    @PutMapping("/{id}/updateStock")
+    public ResponseEntity<ProductDTO> updateStock(@PathVariable Long id, @RequestBody int stock) {
+        ProductDTO updatedProduct = productService.updateStock(id, stock);
+        if (updatedProduct != null) {
+            return ResponseEntity.ok(updatedProduct);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
