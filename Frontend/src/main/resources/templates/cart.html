@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="ISO-8859-1">
     <title>E-Commerce Aplication</title>
@@ -112,6 +112,7 @@
         </div>
     </div>
 </nav>
+<iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
 <div class="row">
 
 
@@ -121,13 +122,13 @@
             <img src="https://cdn-icons-png.flaticon.com/512/9131/9131529.png" >
         </div>
         <h4 class="mt-2">Welcome, User</h4>
-        <span class="mt-1"><i>example@email.com</i></span>
-        <a href="/view-cart"><button class="btn btn-primary mt-3">Check Cart</button></a>
+        <span class="mt-1"><i>Firstname@email.com</i></span>
+        <button class="btn btn-primary mt-3">View Orders</button>
         <hr style="background-color:red;color: blue; outline-width: 2rem;">
         <div class="card bg-body-tertiary" style="padding:1.5rem">
 
             <h5 class="mb-3">Links</h5>
-            <button class="btn btn-info mb-3">View Orders</button>
+            <button class="btn btn-info mb-3">Add products</button>
         </div>
     </div>
 </div>
@@ -138,63 +139,64 @@
     <div class="col-9 blog-column">
         <div class="container overflow-hidden text-center">
             <div class="row gy-5" id="product-list">
-
+                <div class="col-4">
+                    <div class="p-3" th:each="product : ${cartproducts}">
+                        <div class="card" id="product-card">
+                            <div class="card-body">
+                                <h5 class="card-title"><span th:text="${product.id}"></h5>
+                                <p class="card-text"><span th:text="${product.quantity}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <form id="cartForm" method="post" action="/submit-cart">
+            <input type="hidden" id="cartProductsInput" name="cartProducts" th:value="${cartproducts}" />
+            <button class="btn btn-primary " type="submit">Submit Cart</button>
+        </form>
     </div>
 
 </div>
 
 <script>
-    // Function to fetch and display products
-    async function fetchProducts() {
-        try {
-            const response = await fetch('/products');
-            const products = await response.json();
-            const Imgresponse = await fetch('/images');
-            const images = await Imgresponse.json();
-            function getUrlById(id) {
-                // Find the object in the array with the matching ID
-                const item = images.find(item => item.id === id);
-                // Return the URL if found, otherwise return null
-                return item ? item.filepath : null;
+
+    const form = document.getElementById('addToCartForm');
+    form.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent the form from submitting normally
+
+
+        // Retrieve cartproducts from Thymeleaf model attribute
+        var cartproducts = /*[[${cartproducts}]]*/;
+
+        // Convert cartproducts to JSON string and set it as the value of the hidden input field
+        document.getElementById('cartProductsInput').value = JSON.stringify(cartproducts);
+
+
+        const cartProductsInput = document.getElementById('cartProductsInput');
+        const requestBody = {"orderItems": cartProductsInput }
+
+        // Convert cartproducts array to JSON and set it as the value of the hidden input field
+        cartProductsInput.value = JSON.stringify(cartproducts);
+
+        fetch('/createOrder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        }).then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to add item to cart');
             }
-            const productList = document.getElementById('product-list');
+            alert("Added item to cart!")
+        }).catch(error => {
+            console.error('Error:', error);
+            // Handle error (if needed)
+        });
+    })
 
-            // Clear existing content
-            productList.innerHTML = '';
-
-            // Loop through products and generate HTML
-            products.forEach(product => {
-                const productHTML = `
-                        <div class="col-4">
-                            <div class="p-3">
-                                <div class="card">
-                                    <img src="${getUrlById(product.imageId)}" class="card-img-top" alt="...">
-                                    <div class="card-body">
-                                        <h5 class="card-title">${product.name}</h5>
-                                        <p class="card-text">${product.description}</p>
-                                    </div>
-                                    <ul class="list-group list-group-flush">
-                                        <li class="list-group-item">$${product.price}</li>
-                                        <li class="list-group-item">Stock: ${product.stock}</li>
-                                    </ul>
-                                    <div class="card-body">
-                                        <a href="/view-product/${product.id}" class="card-link"><button class="btn btn-primary">Add to Cart</button></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                productList.innerHTML += productHTML;
-            });
-        } catch (error) {
-            console.error('Error fetching products:', error);
-        }
-    }
-
-    // Call fetchProducts when the page loads
-    window.onload = fetchProducts;
 </script>
+
 </body>
 </html>

@@ -11,7 +11,6 @@ import java.util.List;
 public interface ProductClient {
     @GetMapping("products")
     public ResponseEntity<List<ProductDTO>> getAllProducts();
-//
-//    @GetMapping("/images/{id}")
-//    public String getImageByName(@PathVariable Long id);
+    @GetMapping("products/{id}")
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id);
 }

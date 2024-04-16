@@ -1,10 +1,7 @@
 package com.example.frontend.controllers;
 
 
-import com.example.frontend.Image;
-import com.example.frontend.ImageClient;
-import com.example.frontend.ProductClient;
-import com.example.frontend.ProductDTO;
+import com.example.frontend.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,11 +18,21 @@ import java.util.List;
 public class WebController {
     private final ImageClient imageClient;
     private final ProductClient productClient;
+    private final ProductOrderRepository productOrderRepository;
 
     @GetMapping("")
     public String getHomePage(Model model) {
         //model.addAttribute("products", productClient.getAllProducts());
         return "index";
     }
-
+    @GetMapping("view-product/{id}")
+    public String getProductPage(@PathVariable Long id, Model model) {
+        model.addAttribute("product", productClient.getProductById(id).getBody());
+        return "product";
+    }
+    @GetMapping("view-cart")
+    public String getProductPage(Model model) {
+        model.addAttribute("cartproducts", productOrderRepository.findAll());
+        return "cart";
+    }
 }
