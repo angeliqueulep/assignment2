@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@Buildergi
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class Product {
