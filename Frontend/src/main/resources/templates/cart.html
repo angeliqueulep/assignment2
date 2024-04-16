@@ -79,6 +79,15 @@
             align-self: center;
         }
 
+        #emptyCartMessage {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -80%);
+            color: red;
+            font-size: 2em;
+        }
+
     </style>
 </head>
 
@@ -96,49 +105,89 @@
                     <div class="p-3" th:each="product : ${cartproducts}">
                         <div class="card" id="product-card">
                             <div class="card-body">
-                                <h5 class="card-title"><span th:text="${product.id}"></h5>
-                                <p class="card-text"><span th:text="${product.quantity}"></p>
+                                <h5 class="card-title"><span th:text="${product.productName}"></h5>
+                                <p class="card-text"><span th:text="${product.productDescription}"></p>
+                                <p class="card-text">Quantity: <span th:text="${product.quantity}"></p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <form id="submitCartForm">
-            <button class="btn btn-primary " type="submit">Submit Cart</button>
-        </form>
+        <div class="d-flex justify-content-center">
+            <form id="submitCartForm" class="me-3">
+                <button class="btn btn-primary " type="submit">Submit Cart</button>
+            </form>
+            <button id="clearCartButton" class="btn btn-danger">Clear Cart</button>
+        </div>
+        <p id="emptyCartMessage" style="display: none;">There are no products in the cart!</p>
     </div>
 
 </div>
 
 <script>
-
-    const form = document.getElementById('submitCartForm');
-    form.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent the form from submitting normally
-
+    window.onload = function() {
         const url = "/listCart"
 
         fetch(url).then(res => res.json())
-        .then(data => {
-            const requestBody = {"orderItems": data }
-            fetch('/createOrder', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to save order');
+            .then(data => {
+                const form = document.getElementById('submitCartForm');
+                const emptyCartMessage = document.getElementById('emptyCartMessage');
+                const clearCartButton = document.getElementById('clearCartButton');
+
+                if (data.length === 0) {
+                    form.style.display = 'none';
+                    emptyCartMessage.style.display = 'block';
+                    clearCartButton.style.display = 'none';
+                } else {
+                    form.style.display = 'block';
+                    emptyCartMessage.style.display = 'none';
+                    clearCartButton.style.display = 'block';
                 }
-                alert("Order Saved!")
-            }).catch(error => {
-                console.error('Error:', error);
-                // Handle error (if needed)
-            });
-        })
-    })
+
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault(); // Prevent the form from submitting normally
+
+                    const requestBody = {"orderItems": data }
+                    fetch('/createOrder', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(requestBody)
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to save order');
+                        }
+                        // Clear the cart after the order is successfully saved
+                        fetch('/clearCart', {
+                            method: 'POST'
+                        }).then(response => {
+                            if (!response.ok) {
+                                throw new Error('Failed to clear cart');
+                            }
+                            alert("Order Saved and Cart Cleared!")
+                        })
+                    }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                })
+
+                clearCartButton.addEventListener('click', () => {
+                    fetch('/clearCart', {
+                        method: 'POST'
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to clear cart');
+                        }
+                        alert("Removed all items from your cart!")
+                        location.reload(); // Reload the page to update the cart
+                    }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                })
+            })
+    }
 
 </script>
 

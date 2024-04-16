@@ -34,6 +34,13 @@ public class ApiController {
     @PostMapping("addToCart")
     public ResponseEntity addProductToCart(@RequestBody ProductOrder productOrder){
         try {
+            ProductDTO product = productClient.getProductById(productOrder.getProductId()).getBody();
+
+            assert product != null;
+            productOrder.setProductName(product.getName());
+            productOrder.setProductDescription(product.getDescription());
+            productOrder.setProductPrice(product.getPrice());
+
             ProductOrder savedOrder = productOrderRepository.save(productOrder);
             System.out.println("Added product to cart! ProductID: " + savedOrder.getId());
             return ResponseEntity.ok().build();
@@ -62,5 +69,13 @@ public class ApiController {
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         return orderClient.createOrder(orderDTO);
     }
+
+    @PostMapping("clearCart")
+    public ResponseEntity<?> clearCart() {
+        productOrderRepository.deleteAll();
+        return ResponseEntity.ok().build();
+    }
+
+
 
 }
