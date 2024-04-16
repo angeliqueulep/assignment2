@@ -20,6 +20,6 @@ public class Product {
     private double price;
     private int stock;
     @Column(name = "image_id")
-    private String imageId;
+    private int imageId;
 
 }

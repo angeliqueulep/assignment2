@@ -15,5 +15,5 @@ public class Product {
     private String description;
     private double price;
     private int stock;
-    private String imageId;
+    private int imageId;
 }
