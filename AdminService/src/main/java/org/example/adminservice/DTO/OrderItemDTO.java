@@ -1,4 +1,4 @@
-package com.humber.orderservice.DTO;
+package org.example.adminservice.DTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class OrderItemDTO {
     private Long id;
     private Long orderId;
-    private Long productId;
+    private ProductDTO product;
     private int quantity;
     private double price;
 }

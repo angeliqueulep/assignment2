@@ -82,14 +82,17 @@ public class ProductService {
     }
 
     // update stock
-    public ProductDTO updateStock(Long id, int stock) {
-        Product existingProduct = productRepository.findById(id).orElse(null);
-        if (existingProduct != null) {
-            existingProduct.setStock(stock);
-            existingProduct = productRepository.save(existingProduct);
-            return convertToDTO(existingProduct);
+    public ProductDTO updateStock(Long id, int stockChange) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        int newStock = existingProduct.getStock() + stockChange;
+        if (newStock < 0) {
+            throw new IllegalStateException("Insufficient stock for product " + id);
         }
-        return null;
+        existingProduct.setStock(newStock);
+        existingProduct = productRepository.save(existingProduct);
+        return convertToDTO(existingProduct);
     }
 
 

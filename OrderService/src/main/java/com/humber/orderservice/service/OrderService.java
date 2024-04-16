@@ -31,20 +31,12 @@ public class OrderService {
         order.setOrderDate(orderDTO.getOrderDate());
 
         List<OrderItem> orderItems = orderDTO.getOrderItems().stream()
-                .map(dto -> {
-                    OrderItem item = new OrderItem();
-                    ProductDTO product = productClient.getProductById(dto.getProductId());
-                    if (product.getStock() < dto.getQuantity()) {
-                        throw new IllegalStateException("Insufficient stock for product " + dto.getProductId());
-                    }
-                    item.setOrder(order);
-                    item.setProductId(dto.getProductId());
-                    item.setQuantity(dto.getQuantity());
-                    item.setPrice(product.getPrice());
-                    return item;
-                }).collect(Collectors.toList());
+                .map(dto -> createOrderItem(order, dto))
+                .collect(Collectors.toList());
 
-        double totalPrice = orderItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+        double totalPrice = orderItems.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
         order.setTotalPrice(totalPrice);
         order.setOrderItems(orderItems);
 
@@ -54,43 +46,55 @@ public class OrderService {
         return mapToDto(savedOrder);
     }
 
+    private OrderItem createOrderItem(Order order, OrderItemDTO dto) {
+        ProductDTO product = productClient.getProductById(dto.getProductId());
+        if (product == null) {
+            throw new IllegalStateException("Product with ID " + dto.getProductId() + " does not exist.");
+        }
+        if (product.getStock() < dto.getQuantity()) {
+            throw new IllegalStateException("Insufficient stock for product " + dto.getProductId());
+        }
+        OrderItem item = new OrderItem();
+        item.setOrder(order);
+        item.setProductId(dto.getProductId());
+        item.setQuantity(dto.getQuantity());
+        item.setPrice(product.getPrice());
+        return item;
+    }
+
     private OrderDTO mapToDto(Order order) {
-        List<OrderItemDTO> itemDTOs = order.getOrderItems().stream().map(item -> {
-            ProductDTO productDTO = productClient.getProductById(item.getProductId());
-            return new OrderItemDTO(item.getId(), order.getId(), productDTO, item.getQuantity(), item.getPrice());
-        }).collect(Collectors.toList());
+        List<OrderItemDTO> itemDTOs = order.getOrderItems().stream()
+                .map(item -> new OrderItemDTO(item.getId(), order.getId(), item.getProductId(), item.getQuantity(), item.getPrice()))
+                .collect(Collectors.toList());
 
         return new OrderDTO(order.getId(), order.getOrderDate(), order.getTotalPrice(), itemDTOs);
     }
 
     // update order
+
     public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
         Order order = orderRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Order not found"));
 
-        List<OrderItem> orderItems = orderDTO.getOrderItems().stream()
-                .map(dto -> {
-                    OrderItem item = new OrderItem();
-                    ProductDTO product = productClient.getProductById(dto.getProductId());
-                    if (product.getStock() < dto.getQuantity()) {
-                        throw new IllegalStateException("Insufficient stock for product " + dto.getProductId());
-                    }
-                    item.setOrder(order);
-                    item.setProductId(dto.getProductId());
-                    item.setQuantity(dto.getQuantity());
-                    item.setPrice(product.getPrice());
-                    return item;
-                }).collect(Collectors.toList());
+        // Assuming the only updatable fields are the items themselves
+        order.getOrderItems().clear();
+        List<OrderItem> updatedItems = orderDTO.getOrderItems().stream()
+                .map(dto -> createOrderItem(order, dto))
+                .collect(Collectors.toList());
+        order.setOrderItems(updatedItems);
 
-        double totalPrice = orderItems.stream().mapToDouble(item -> item.getPrice() * item.getQuantity()).sum();
+        double totalPrice = updatedItems.stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
         order.setTotalPrice(totalPrice);
-        order.setOrderItems(orderItems);
 
-        orderItems.forEach(item -> productClient.updateStock(item.getProductId(), -item.getQuantity()));
+        // Update stock quantities (reduce new items, restore old stock assumed handled elsewhere)
+        updatedItems.forEach(item -> productClient.updateStock(item.getProductId(), -item.getQuantity()));
 
-        Order savedOrder = orderRepository.save(order);
-        return mapToDto(savedOrder);
+        Order updatedOrder = orderRepository.save(order);
+        return mapToDto(updatedOrder);
     }
+
 
     // delete order
     public boolean deleteOrder(Long id) {

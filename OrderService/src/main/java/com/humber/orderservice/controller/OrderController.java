@@ -1,6 +1,11 @@
 package com.humber.orderservice.controller;
 
 import com.humber.orderservice.DTO.OrderDTO;
+import com.humber.orderservice.DTO.OrderItemDTO;
+import com.humber.orderservice.DTO.ProductDTO;
+import com.humber.orderservice.client.IProductClient;
+import com.humber.orderservice.entity.Order;
+import com.humber.orderservice.entity.OrderItem;
 import com.humber.orderservice.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("orders")
@@ -19,8 +25,8 @@ public class OrderController {
     private OrderService orderService;
 
     private StreamBridge streamBridge;
-    private Logger logger = LoggerFactory.getLogger(OrderController.class);
 
+    private final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     // Get all orders
     @GetMapping
@@ -31,14 +37,15 @@ public class OrderController {
 
     // Create new order
     @PostMapping
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDto) {
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
         try {
-            OrderDTO newOrder = orderService.createOrder(orderDto);
+            OrderDTO newOrder = orderService.createOrder(orderDTO);
             logger.info("Sending request to Email Server");
             streamBridge.send("sendPlaceorder-out-0", newOrder);
             return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            logger.error("Error creating order", e);
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
@@ -55,16 +62,12 @@ public class OrderController {
 
     // Update an order
     @PutMapping("/{id}")
-    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDto) {
+    public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
         try {
-            OrderDTO updatedOrder = orderService.updateOrder(id, orderDto);
-            if (updatedOrder != null) {
-                return ResponseEntity.ok(updatedOrder);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            OrderDTO updatedOrder = orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(updatedOrder);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(null);
         }
     }
 
