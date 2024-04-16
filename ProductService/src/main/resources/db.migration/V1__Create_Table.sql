@@ -5,6 +5,5 @@ CREATE TABLE product
     description TEXT,
     price       DECIMAL(10, 2) NOT NULL,
     stock       INT NOT NULL,
-    image_id    VARCHAR(50) NOT NULL
+    image_id    BIGINT NOT NULL
 );
-
