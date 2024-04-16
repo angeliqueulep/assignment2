@@ -14,12 +14,12 @@ import lombok.NoArgsConstructor;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
     private String name;
     private String description;
     private double price;
     private int stock;
     @Column(name = "image_id")
-    private int imageId;
+    private Long imageId;
 
 }
