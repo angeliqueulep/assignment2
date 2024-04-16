@@ -35,13 +35,12 @@ public class ApiController {
     public ResponseEntity addProductToCart(@RequestBody ProductOrder productOrder){
         try {
             ProductOrder savedOrder = productOrderRepository.save(productOrder);
-            System.out.println("Image created successfully with ID: " + savedOrder.getId());
+            System.out.println("Added product to cart! ProductID: " + savedOrder.getId());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             System.out.println("Failed to create image: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
-
     }
 
     @GetMapping("listCart")

@@ -151,8 +151,7 @@
                 </div>
             </div>
         </div>
-        <form id="cartForm" method="post" action="/submit-cart">
-            <input type="hidden" id="cartProductsInput" name="cartProducts" th:value="${cartproducts}" />
+        <form id="submitCartForm">
             <button class="btn btn-primary " type="submit">Submit Cart</button>
         </form>
     </div>
@@ -161,39 +160,30 @@
 
 <script>
 
-    const form = document.getElementById('addToCartForm');
+    const form = document.getElementById('submitCartForm');
     form.addEventListener('submit', (event) => {
         event.preventDefault(); // Prevent the form from submitting normally
 
+        const url = "/listCart"
 
-        // Retrieve cartproducts from Thymeleaf model attribute
-        var cartproducts = /*[[${cartproducts}]]*/;
-
-        // Convert cartproducts to JSON string and set it as the value of the hidden input field
-        document.getElementById('cartProductsInput').value = JSON.stringify(cartproducts);
-
-
-        const cartProductsInput = document.getElementById('cartProductsInput');
-        const requestBody = {"orderItems": cartProductsInput }
-
-        // Convert cartproducts array to JSON and set it as the value of the hidden input field
-        cartProductsInput.value = JSON.stringify(cartproducts);
-
-        fetch('/createOrder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        }).then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to add item to cart');
-            }
-            alert("Added item to cart!")
-        }).catch(error => {
-            console.error('Error:', error);
-            // Handle error (if needed)
-        });
+        fetch(url).then(res => res.json())
+        .then(data => {
+            fetch('/createOrder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to save order');
+                }
+                alert("Order Saved!")
+            }).catch(error => {
+                console.error('Error:', error);
+                // Handle error (if needed)
+            });
+        })
     })
 
 </script>
