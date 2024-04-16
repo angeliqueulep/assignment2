@@ -2,7 +2,10 @@ package com.humber.orderservice.controller;
 
 import com.humber.orderservice.DTO.OrderDTO;
 import com.humber.orderservice.service.OrderService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +17,10 @@ import java.util.List;
 public class OrderController {
     @Autowired
     private OrderService orderService;
+
+    private StreamBridge streamBridge;
+    private Logger logger = LoggerFactory.getLogger(OrderController.class);
+
 
     // Get all orders
     @GetMapping
@@ -27,6 +34,8 @@ public class OrderController {
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDto) {
         try {
             OrderDTO newOrder = orderService.createOrder(orderDto);
+            logger.info("Sending request to Email Server");
+            streamBridge.send("sendPlaceorder-out-0", newOrder);
             return new ResponseEntity<>(newOrder, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

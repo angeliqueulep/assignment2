@@ -18,7 +18,7 @@ public class FunctionConfiguration {
     }
 
     @Bean
-    Function<ProductDTO, Boolean> email(){
+    Function<ProductDTO, Boolean> deleteImageByProduct(){
         return (ProductDTO product)->{
             Long imageId = product.getImageId();
             logger.info("Deleting Image with ID: " + imageId);
