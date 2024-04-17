@@ -57,12 +57,11 @@ public class AdminController {
 
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productClient.deleteProduct(id);
-
         // Kafka stream event
         ProductDTO product = productClient.getProductById(id);
         logger.info("Sending request to Delete Image for productID: " + id);
         streamBridge.send("senddelete-out-0.", product);
+        productClient.deleteProduct(id);
 
         return ResponseEntity.ok().build();
     }
