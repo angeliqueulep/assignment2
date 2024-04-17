@@ -38,8 +38,11 @@ public class AdminController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<ProductDTO> createProduct(ProductDTO productDTO) {
-        return ResponseEntity.ok(productClient.createProduct(productDTO));
+    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDTO) {
+        logger.info("Creating product with data: " + productDTO.toString());
+        ProductDTO createdProduct = productClient.createProduct(productDTO);
+
+        return ResponseEntity.ok(createdProduct);
     }
 
     @GetMapping("/products/{id}")
