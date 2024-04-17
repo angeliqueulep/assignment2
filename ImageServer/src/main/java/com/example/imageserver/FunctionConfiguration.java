@@ -17,9 +17,24 @@ public class FunctionConfiguration {
         this.imageRepository = imageRepository;
     }
 
+//    @Bean
+//    Function<Long, Boolean> deleteproductimg(){
+//        return (Long imageId)->{
+//            logger.info("Deleting Image with ID: " + imageId);
+//
+//            Optional<Image> optionalImage = imageRepository.findById(imageId);
+//            if (optionalImage.isEmpty()) {
+//                return false;
+//            }
+//            imageRepository.delete(optionalImage.get());
+//            return true;
+//        };
+//    }
     @Bean
-    Function<Long, Boolean> deleteImageByProduct(){
-        return (Long imageId)->{
+    Function<ProductDTO, Boolean> deleteImg(){
+        return (ProductDTO productDTO)->{
+            logger.info("Received deleteIMG event  ");
+            Long imageId = productDTO.getImageId();
             logger.info("Deleting Image with ID: " + imageId);
 
             Optional<Image> optionalImage = imageRepository.findById(imageId);
