@@ -39,4 +39,15 @@ public class ImageController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create image: " + e.getMessage());
         }
     }
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteImageByName(@PathVariable Long id) {
+        Optional<Image> image = imageRepository.findById(id);
+        if (image.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failed to delete image: " + id);
+        }
+        imageRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body("Image deleted successfully with ID: " + id);
+    }
 }
