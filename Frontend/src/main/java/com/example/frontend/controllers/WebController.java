@@ -27,7 +27,7 @@ public class WebController {
     }
     @GetMapping("view-product/{id}")
     public String getProductPage(@PathVariable Long id, Model model) {
-        model.addAttribute("product", productClient.getProductById(id).getBody());
+        model.addAttribute("product", productClient.getProductById(id));
         return "product";
     }
     @GetMapping("view-cart")

@@ -10,7 +10,7 @@ import java.util.List;
 @FeignClient("product-service")
 public interface ProductClient {
     @GetMapping("products")
-    public ResponseEntity<List<ProductDTO>> getAllProducts();
+    public List<ProductDTO> getAllProducts();
     @GetMapping("products/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id);
+    public ProductDTO getProductById(@PathVariable Long id);
 }

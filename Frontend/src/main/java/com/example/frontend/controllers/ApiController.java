@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 // @RestController
@@ -36,7 +37,13 @@ public class ApiController {
 
     @GetMapping("products")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        return productClient.getAllProducts();
+        List<ProductDTO> allProducts = productClient.getAllProducts();
+
+        List<ProductDTO> productsInStock = allProducts.stream()
+                .filter(product -> product.getStock() > 0)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(productsInStock);
     }
 
     @PostMapping("createOrder")
@@ -51,9 +58,9 @@ public class ApiController {
 
 
     @PostMapping("addToCart")
-    public ResponseEntity addProductToCart(@RequestBody ProductOrder productOrder){
+    public ResponseEntity<?> addProductToCart(@RequestBody ProductOrder productOrder){
         try {
-            ProductDTO product = productClient.getProductById(productOrder.getProductId()).getBody();
+            ProductDTO product = productClient.getProductById(productOrder.getProductId());
 
             assert product != null;
             productOrder.setProductName(product.getName());
