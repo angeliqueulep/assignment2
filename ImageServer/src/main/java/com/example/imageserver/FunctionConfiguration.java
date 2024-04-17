@@ -18,9 +18,8 @@ public class FunctionConfiguration {
     }
 
     @Bean
-    Function<ProductDTO, Boolean> deleteImageByProduct(){
-        return (ProductDTO product)->{
-            Long imageId = product.getImageId();
+    Function<Long, Boolean> deleteImageByProduct(){
+        return (Long imageId)->{
             logger.info("Deleting Image with ID: " + imageId);
 
             Optional<Image> optionalImage = imageRepository.findById(imageId);
