@@ -4,7 +4,10 @@ import org.example.adminservice.DTO.OrderDTO;
 import org.example.adminservice.DTO.ProductDTO;
 import org.example.adminservice.client.OrderClient;
 import org.example.adminservice.client.ProductClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,14 @@ public class AdminController {
 
     @Autowired
     private OrderClient orderClient;
+
+
+    private StreamBridge streamBridge;
+    public AdminController(StreamBridge streamBridge){
+        this.streamBridge = streamBridge;
+    }
+
+    private Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     // Product Endpoints
     @GetMapping("/products")
@@ -44,6 +55,12 @@ public class AdminController {
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productClient.deleteProduct(id);
+
+        // Kafka stream event
+        ProductDTO product = productClient.getProductById(id);
+        logger.info("Sending request to Delete Image for productID: " + id);
+        streamBridge.send("senddelete-out-0.", product);
+
         return ResponseEntity.ok().build();
     }
 
