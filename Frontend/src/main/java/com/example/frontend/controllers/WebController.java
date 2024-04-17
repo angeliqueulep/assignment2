@@ -37,7 +37,7 @@ public class WebController {
         return "cart";
     }
 
-    @GetMapping("viewOrderHistory")
+    @GetMapping("view-order-history")
     public String getOrderHistory(Model model) {
         model.addAttribute("orders", productOrderRepository.findAll());
         return "orderHistory";

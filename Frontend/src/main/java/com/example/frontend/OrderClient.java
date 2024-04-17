@@ -11,6 +11,9 @@ import java.util.List;
 
 @FeignClient("order-service")
 public interface OrderClient {
+    @GetMapping("orders")
+    public ResponseEntity<List<OrderDTO>> getAllOrders();
+
     @PostMapping("orders")
     public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO);
 }

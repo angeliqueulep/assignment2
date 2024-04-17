@@ -22,12 +22,31 @@ public class ApiController {
     private final ProductClient productClient;
     private final OrderClient orderClient;
 
-
     private final ProductOrderRepository productOrderRepository;
 
     @GetMapping("images")
     public List<Image> getImages(){
         return imageClient.getImages();
+    }
+
+    @GetMapping("images/{id}")
+    public String getImageByName(@PathVariable Long id){
+        return imageClient.getImageByName(id);
+    }
+
+    @GetMapping("products")
+    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+        return productClient.getAllProducts();
+    }
+
+    @PostMapping("createOrder")
+    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
+        return orderClient.createOrder(orderDTO);
+    }
+
+    @GetMapping("orders")
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        return orderClient.getAllOrders();
     }
 
 
@@ -53,21 +72,6 @@ public class ApiController {
     @GetMapping("listCart")
     public List<ProductOrder> getCartItems() {
         return productOrderRepository.findAll();
-    }
-
-    @GetMapping("images/{id}")
-    public String getImageByName(@PathVariable Long id){
-        return imageClient.getImageByName(id);
-    }
-
-    @GetMapping("products")
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        return productClient.getAllProducts();
-    }
-
-    @PostMapping("createOrder")
-    public ResponseEntity<OrderDTO> createOrder(@RequestBody OrderDTO orderDTO) {
-        return orderClient.createOrder(orderDTO);
     }
 
     @PostMapping("clearCart")
